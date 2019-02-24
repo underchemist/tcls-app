@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import LogFile, ChatComment
+
+admin.site.register(LogFile)
+admin.site.register(ChatComment)

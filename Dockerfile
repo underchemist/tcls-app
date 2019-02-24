@@ -4,7 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 RUN apk add --no-cache postgresql-libs && \
     apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev && \
     apk --purge del .build-deps
-RUN mkdir /app
+RUN mkdir /app && mkdir /data
 WORKDIR /app
 COPY requirements.txt /app
 RUN apk add --no-cache postgresql-libs && \
