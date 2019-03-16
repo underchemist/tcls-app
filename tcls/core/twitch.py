@@ -83,8 +83,6 @@ def diff(old, new):
     # strip None values where two vods where different but had same duration
     return [i for i in list(d.values()) if i is not None]
 
-# Views related
-
 def compare_db_vods_to_new():
     qs = Video.objects.all()
     vods_db = [v.data for v in qs]
