@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'django_extensions'
-    
+
 ]
 
 MIDDLEWARE = [
@@ -131,3 +131,6 @@ STATIC_URL = '/static/'
 
 MEDIA_URL = '/data/'
 MEDIA_ROOT = '/data/'
+
+# django-extensions config
+SHELL_PLUS = 'ipython'
