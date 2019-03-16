@@ -13,6 +13,8 @@ services:
   #   env_file: vod_downloader/vod_downloader.env
   #   volumes:
   #     - chatlogs/:/chatlogs
+  redis:
+    image: redis:alpine
   web:
     container_name: tcls
     build: .
@@ -25,6 +27,17 @@ services:
     env_file: dev.env
     depends_on:
       - db
+      - redis
+  celery:
+    image: tcls-app_web
+    command: celery -A tcls worker -l info
+    volumes:
+      - ./tcls/:/app
+    env_file: dev.env
+    depends_on:
+      - db
+      - redis
+
 volumes:
   pg_data:
   chatlogs:
