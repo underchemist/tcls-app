@@ -141,3 +141,6 @@ CELERY_RESULT_BACKEND = 'redis://redis:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ROUTES = {
+    '..core.tasks.download_vod': {'queue', 'vod_queue'}
+}

@@ -28,7 +28,8 @@ services:
     depends_on:
       - db
       - redis
-  celery:
+  web_worker:
+    container_name: web_worker
     image: tcls-app_web
     command: celery -A tcls worker -l info
     volumes:
@@ -36,6 +37,15 @@ services:
     env_file: dev.env
     depends_on:
       - db
+      - redis
+  vod_worker:
+    container_name: vod_worker
+    build: vod_downloader/.
+    command: celery -A vod_downloader worker -l debug -Q vod_queue
+    volumes:
+      - ./vod_downloader/:/app
+      - chatlogs/:/chatlogs
+    depends_on:
       - redis
 
 volumes:
