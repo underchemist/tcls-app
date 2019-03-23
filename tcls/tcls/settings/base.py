@@ -129,8 +129,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-MEDIA_URL = '/data/'
-MEDIA_ROOT = '/data/'
+MEDIA_URL = '/chatlogs/'
+MEDIA_ROOT = '/chatlogs/'
 
 # django-extensions config
 SHELL_PLUS = 'ipython'
@@ -142,5 +142,5 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ROUTES = {
-    '..core.tasks.download_vod': {'queue', 'vod_queue'}
+    'core.tasks.download_chat_by_id': {'queue': 'vod_queue'}
 }

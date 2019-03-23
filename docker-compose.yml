@@ -7,13 +7,8 @@ services:
     env_file: dev.env
     volumes:
       - pg_data/:/var/lib/postgresql/data
-  # vod_downloader:
-  #   container_name: tcls_vd
-  #   build: './vod_downloader'
-  #   env_file: vod_downloader/vod_downloader.env
-  #   volumes:
-  #     - chatlogs/:/chatlogs
   redis:
+    container_name: redis
     image: redis:alpine
   web:
     container_name: tcls
@@ -41,12 +36,21 @@ services:
   vod_worker:
     container_name: vod_worker
     build: vod_downloader/.
-    command: celery -A vod_downloader worker -l debug -Q vod_queue
+    command: celery -A vod_downloader worker -l info -Q vod_queue --autoscale 4,2
     volumes:
       - ./vod_downloader/:/app
       - chatlogs/:/chatlogs
     depends_on:
       - redis
+  flower:
+    container_name: flower
+    image: mher/flower
+    command: ['flower', '--broker=redis://redis:6379/0', '--port=8001']
+    ports:
+      - 8001:8001
+    depends_on:
+      - vod_worker
+      - web_worker
 
 volumes:
   pg_data:
