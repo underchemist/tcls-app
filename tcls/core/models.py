@@ -38,7 +38,7 @@ class LogFile(models.Model):
 
         return duration
 
-    def _is_similar_length(self,tol=timedelta(minutes=1)):
+    def _is_similar_duration(self,tol=timedelta(minutes=1)):
         """Compare calculated duration of chatlog and the duration from video object in order to say whether the chatlog has actually downloaded the full amount
         """
         chatlog_duration = self._calc_duration()
