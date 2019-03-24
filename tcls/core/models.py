@@ -27,7 +27,7 @@ class LogFile(models.Model):
         """Determine the approximate duration of the chatlog by tailing the end of the logfile """
         with self.filepath.open('rb') as f:
             f.seek(offset, 2)  # seek to almost EOF
-            tail = [line.decode('utf-8') for line in f.readlines()]
+            tail = [line.decode('utf-8', 'ignore') for line in f.readlines()]
 
             return tail
 
