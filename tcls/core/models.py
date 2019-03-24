@@ -6,6 +6,7 @@ from datetime import timedelta
 
 class Video(models.Model):
     data = JSONField(encoder=DjangoJSONEncoder)
+    archived = models.BooleanField(default=False)
 
     @classmethod
     def from_db(cls, db, field_names, values):

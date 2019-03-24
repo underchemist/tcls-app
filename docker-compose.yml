@@ -36,7 +36,7 @@ services:
   vod_worker:
     container_name: vod_worker
     build: vod_downloader/.
-    command: celery -A vod_downloader worker -l info -Q vod_queue --autoscale 4,2
+    command: celery -A vod_downloader worker -l info -Q vod_queue --max-memory-per-child 300000 --max-tasks-per-child 2
     volumes:
       - ./vod_downloader/:/app
       - chatlogs/:/chatlogs

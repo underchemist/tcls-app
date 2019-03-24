@@ -31,7 +31,7 @@ def reset_and_get_videos():
     logging.info('Added all archived videos from owl channel')
 
 @shared_task
-def create_logfile(filename, username, video_id):
+def create_logfile(filename, username, vid):
     """Create instance of LogFile
 
     Should be used in chained task with remote download_chat_by_id task
@@ -41,12 +41,15 @@ def create_logfile(filename, username, video_id):
         username (str): Username of twitch channel. Required to find the file
             as Twitch-Chat-Downloader saves output to
             /chatlogs/<username>/<filename>.
-        video_id (int or str): Id of twitch video.
+        vid (int or str): Id of tcls video object.
     """
+    if filename is None:
+        logger.info('Chat comments did not successfully download, not creating LogFile')
+        return None
 
     filepath = Path('/chatlogs', username, filename)
     try:
-        obj, created = LogFile.objects.update_or_create(filepath=str(filepath), video_id=video_id)
+        obj, created = LogFile.objects.update_or_create(filepath=str(filepath), video=vid)
         if created:
             logger.info('Created LogFile {} with file: {}'.format(obj.id, obj.filepath.name))
         else:

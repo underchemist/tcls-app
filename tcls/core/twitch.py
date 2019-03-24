@@ -107,7 +107,7 @@ def compare_db_vods_to_log():
     return qs_vods_exc
 
 
-def get_chat(vid):
+def get_chat_chain(vid):
     """Execute worker to get chatlog from twitch api
 
     Arguments:
@@ -122,13 +122,18 @@ def get_chat(vid):
 
     c = celery.chain(
         t,
-        tasks.create_logfile.s(video.data['user_name'].lower(), video.data['id'])
+        tasks.create_logfile.s(video.data['user_name'].lower(), vid)
         )
 
-    c.apply_async()
+    return c
 
-def get_all_chat_missing():
-    qs = compare_db_vods_to_log()
-
+@shared_task
+def get_all_chat_from_qs(qs=None):
+    if qs is None:
+        qs = compare_db_vods_to_log()
+    tasks = []
     for video in qs:
-        get_chat(video.id)
+        tasks.append(get_chat_chain(video.id))
+
+    g = celery.group(tasks)
+    g.apply_async()

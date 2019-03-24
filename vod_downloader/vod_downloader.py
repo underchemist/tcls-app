@@ -32,6 +32,9 @@ def download_chat_by_id(video_id):
         logger.info('Downloading chat comments for video {}'.format(video_id))
         result = subprocess.Popen(cmd_list, cwd=TCD_BASE_DIR)
         output = result.communicate()
+        if output[1]:
+            logger.error('Could not download chat comments for video {}: {}'.format(video_id, output[1]))
+            return None
         logger.info('Downloaded chat comments for video {}. Output: {}, Error: {}'.format(video_id, output[0], output[1]))
         return 'v' + str(video_id) + '.txt'
     except Exception as e:
