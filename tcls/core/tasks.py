@@ -49,7 +49,8 @@ def create_logfile(filename, username, vid):
 
     filepath = Path('/chatlogs', username, filename)
     try:
-        obj, created = LogFile.objects.update_or_create(filepath=str(filepath), video=vid)
+        video = Video.objects.get(id=vid)
+        obj, created = LogFile.objects.update_or_create(filepath=str(filepath), video=video)
         if created:
             logger.info('Created LogFile {} with file: {}'.format(obj.id, obj.filepath.name))
         else:
