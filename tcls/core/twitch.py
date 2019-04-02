@@ -97,14 +97,7 @@ def compare_db_vods_to_new():
     return diff(vods_db, vods_api)
 
 def compare_db_vods_to_log():
-    qs_vods = Video.objects.all()
-    qs_log = LogFile.objects.all()
-
-    # all Video that don't have a corresponding LogFile
-    values = list(qs_log.values_list('video_id', flat=True))
-    qs_vods_exc = qs_vods.exclude(data__id__in=values)
-
-    return qs_vods_exc
+    return Video.objects.filter(logfile__pk__isnull=True)
 
 
 def get_chat_chain(vid):
@@ -127,7 +120,6 @@ def get_chat_chain(vid):
 
     return c
 
-@shared_task
 def get_all_chat_from_qs(qs=None):
     if qs is None:
         qs = compare_db_vods_to_log()

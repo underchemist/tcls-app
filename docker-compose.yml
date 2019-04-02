@@ -29,6 +29,7 @@ services:
     command: celery -A tcls worker -l info
     volumes:
       - ./tcls/:/app
+      - chatlogs/:/chatlogs
     env_file: dev.env
     depends_on:
       - db
