@@ -123,9 +123,22 @@ def get_chat_chain(vid):
 def get_all_chat_from_qs(qs=None):
     if qs is None:
         qs = compare_db_vods_to_log()
-    tasks = []
+    task_list = []
     for video in qs:
-        tasks.append(get_chat_chain(video.id))
+        task_list.append(get_chat_chain(video.id))
 
-    g = celery.group(tasks)
+    g = celery.group(task_list)
     g.apply_async()
+
+def load_chatcomment_from_logfile(qs=None):
+    if qs is None:
+        qs = LogFile.objects.all()
+
+    task_list = []
+    for logfile in qs:
+        task_list.append(tasks.create_chatcomments.s(logfile.id))
+
+    g = celery.group(task_list)
+    group_result = g.apply_async()
+
+    return group_result
