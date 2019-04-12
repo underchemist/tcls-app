@@ -16,12 +16,22 @@ class Video(models.Model):
 
         return new
 
+    def __str__(self):
+        return self.data['title']
+
+class LogFileManager(models.Manager):
+
+    def has_no_chatcomment(self):
+        qs = LogFile.objects.filter(chatcomment__isnull=True)
+
+        return qs
 
 class LogFile(models.Model):
     video = models.OneToOneField(Video, on_delete=models.CASCADE)
     filepath = models.FileField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    objects = LogFileManager()
 
     def _tail(self, offset=-1024):
         """Determine the approximate duration of the chatlog by tailing the end of the logfile """

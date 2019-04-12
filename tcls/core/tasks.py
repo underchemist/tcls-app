@@ -47,7 +47,8 @@ def create_logfile(filename, username, vid):
 @shared_task
 def create_chatcomments(lid):
     chat = parse.parse_chatlog(lid)
+    logfile = LogFile.objects.get(id=lid)
 
-    chat_comments = [ChatComment(time=line[0], username=line[1], msg=line[2], logfile=LogFile.objects.get(id=lid)) for line in chat]
+    chat_comments = [ChatComment(time=line[0], username=line[1], msg=line[2], logfile=logfile) for line in chat]
 
     ChatComment.objects.bulk_create(chat_comments)

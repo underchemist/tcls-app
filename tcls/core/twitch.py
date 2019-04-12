@@ -99,6 +99,14 @@ def compare_db_vods_to_new():
 def compare_db_vods_to_log():
     return Video.objects.filter(logfile__pk__isnull=True)
 
+def add_videos(vod_list):
+    """Add Video objects to db.
+
+    Args:
+        vod_list (list of dict): List of twitch vod objects to add.
+    """
+    for data in vod_list:
+        Video.objects.update_or_create(data=data)
 
 def get_chat_chain(vid):
     """Execute worker to get chatlog from twitch api
@@ -106,7 +114,6 @@ def get_chat_chain(vid):
     Arguments:
         vid (int): pk of Video object.
     """
-
     video = Video.objects.get(pk=vid)
     t = tasks.get_remote_sig(
         'vod_downloader.download_chat_by_id',
@@ -132,7 +139,7 @@ def get_all_chat_from_qs(qs=None):
 
 def load_chatcomment_from_logfile(qs=None):
     if qs is None:
-        qs = LogFile.objects.all()
+        qs = LogFile.objects.has_no_chatcomment()
 
     task_list = []
     for logfile in qs:
