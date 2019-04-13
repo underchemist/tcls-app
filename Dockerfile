@@ -1,6 +1,7 @@
 FROM amancevice/pandas:0.24.1-alpine
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
+RUN apk add linux-headers
 RUN mkdir /app && mkdir /chatlogs && mkdir /vendor
 COPY requirements.txt /tmp/requirements.txt
 COPY vendor/twitch-chat-spam-counter /tmp/twitch-chat-spam-counter

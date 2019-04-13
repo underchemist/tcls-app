@@ -1,8 +1,10 @@
+from datetime import timedelta
+from collections import deque
+
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.dateparse import parse_datetime, parse_duration
-from datetime import timedelta
 
 class Video(models.Model):
     data = JSONField(encoder=DjangoJSONEncoder)
@@ -17,7 +19,7 @@ class Video(models.Model):
         return new
 
     def __str__(self):
-        return self.data['title']
+        return 'Video object ({}): {}'.format(self.id, self.data['title'])
 
 class LogFileManager(models.Manager):
 
@@ -40,6 +42,10 @@ class LogFile(models.Model):
             tail = [line.decode('utf-8', 'ignore') for line in f.readlines()]
 
             return tail
+
+    def _tail_deque(self, n=10):
+        with self.filepath.open('r') as f:
+            return deque(f, n)
 
     def _calc_duration(self):
         tail = self._tail()
