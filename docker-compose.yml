@@ -24,10 +24,20 @@ services:
     depends_on:
       - db
       - redis
+  celery_beat:
+    container_name: celery_beat
+    image: tcls-app_web
+    command: celery -A tcls beat -l debug --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    env_file: dev.env
+    volumes:
+      - ./tcls/:/app
+    depends_on:
+      - db
+      - redis
   web_worker:
     container_name: web_worker
     image: tcls-app_web
-    command: celery -A tcls worker -l info
+    command: celery -A tcls worker -l debug
     volumes:
       - ./tcls/:/app
       - chatlogs/:/chatlogs

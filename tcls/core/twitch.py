@@ -14,8 +14,8 @@ from .models import Video, LogFile, ChatComment
 CLIENT_ID = os.getenv('TWITCH_API_CLIENT_ID')
 OWL_USER_ID = '137512364'
 
-class Channel:
 
+class Channel:
     def __init__(self, user_id):
         self.user_id = user_id
         self.data_path = Path('/chatlogs')
@@ -24,9 +24,7 @@ class Channel:
 
     def _get_all_archived_vods(self):
         video_iter = self.client.get_videos(
-            user_id=self.user_id,
-            page_size=100,
-            video_type='archive'
+            user_id=self.user_id, page_size=100, video_type='archive'
         )
 
         all_vods = Vods()
@@ -37,10 +35,7 @@ class Channel:
         return all_vods
 
     def _get_vods_by_id(self, ids):
-        video_iter = self.client.get_videos(
-            video_ids=ids,
-            page_size=100
-        )
+        video_iter = self.client.get_videos(video_ids=ids, page_size=100)
 
         all_vods = Vods()
 
@@ -57,7 +52,6 @@ class Channel:
 
 
 class Vods(list):
-
     def to_list_of_dict(self):
         return [dict(v) for v in self]
 
@@ -71,6 +65,7 @@ def newest(a, b):
 
     # if identical in duration then will remove
     return None
+
 
 def diff(old, new):
     intersect = [item for item in old if item in new]
@@ -86,6 +81,7 @@ def diff(old, new):
     # strip None values where two vods where different but had same duration
     return [i for i in list(d.values()) if i is not None]
 
+
 def get_new_vods():
     qs = Video.objects.all()
     vods_db = [v.data for v in qs]
@@ -96,8 +92,10 @@ def get_new_vods():
 
     return diff(vods_db, vods_api)
 
+
 def compare_db_vods_to_log():
     return Video.objects.filter(logfile__pk__isnull=True)
+
 
 def add_videos(vod_list):
     """Add Video objects to db.
@@ -108,6 +106,7 @@ def add_videos(vod_list):
     for data in vod_list:
         Video.objects.update_or_create(data=data)
 
+
 def get_chat_chain(vid):
     """Execute worker to get chatlog from twitch api
 
@@ -116,16 +115,13 @@ def get_chat_chain(vid):
     """
     video = Video.objects.get(pk=vid)
     t = tasks.get_remote_sig(
-        'vod_downloader.download_chat_by_id',
-        args=[video.data['id']]
-        )
+        'vod_downloader.download_chat_by_id', args=[video.data['id']]
+    )
 
-    c = celery.chain(
-        t,
-        tasks.create_logfile.s(video.data['user_name'].lower(), vid)
-        )
+    c = celery.chain(t, tasks.create_logfile.s(video.data['user_name'].lower(), vid))
 
     return c
+
 
 def get_all_chat_from_qs(qs=None):
     if qs is None:
@@ -135,7 +131,10 @@ def get_all_chat_from_qs(qs=None):
         task_list.append(get_chat_chain(video.id))
 
     g = celery.group(task_list)
-    g.apply_async()
+    group_result = g.apply_async()
+
+    return group_result
+
 
 def load_chatcomment_from_logfile(qs=None):
     if qs is None:

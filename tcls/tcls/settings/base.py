@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
-    'django_extensions',
+    'celerybeat_status',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -130,9 +131,6 @@ STATIC_URL = '/static/'
 
 MEDIA_URL = '/chatlogs/'
 MEDIA_ROOT = '/chatlogs/'
-
-# django-extensions config
-SHELL_PLUS = 'ipython'
 
 # Celery settings
 CELERY_BROKER_URL = 'redis://redis:6379'

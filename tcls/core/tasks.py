@@ -52,3 +52,22 @@ def create_chatcomments(lid):
     chat_comments = [ChatComment(time=line[0], username=line[1], msg=line[2], logfile=logfile) for line in chat]
 
     ChatComment.objects.bulk_create(chat_comments)
+
+@shared_task
+def get_twitch_vods_daily():
+    logger.info('Starting daily vod fetch task')
+    new_vods = twitch.get_new_vods()
+
+    if new_vods:
+        logger.info('Found {} new vods from twitch: {}'.format(len(new_vods), ', '.join([v['title'] for v in new_vods])))
+        twitch.add_videos(new_vods)
+        logger.info('Adding vods to db')
+
+        # get queryset of Video that don't have corresponding logfile
+        video_qs = twitch.compare_db_vods_to_log()
+
+        getchat_result = twitch.get_all_chat_from_qs(video_qs)
+        getchat_result.get()
+
+        load_chatcomment_result = twitch.load_chatcomment_from_logfile()
+        load_chatcomment_result.get()
